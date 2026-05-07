@@ -1,0 +1,811 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ПАУЭР БАНК - Полная Диагностика</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 100%);
+            color: #fff;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 30px;
+            background: rgba(42, 157, 143, 0.1);
+            border: 2px solid #D4AF37;
+            border-radius: 12px;
+        }
+
+        .logo-header {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .logo-battery {
+            width: 50px;
+            height: 30px;
+            border: 2px solid #D4AF37;
+            border-radius: 3px;
+            display: flex;
+            gap: 2px;
+            padding: 2px;
+            align-items: center;
+            justify-content: space-around;
+        }
+
+        .battery-segment {
+            flex: 1;
+            height: 10px;
+            border-radius: 1px;
+            background: #D4AF37;
+        }
+
+        .battery-segment.empty {
+            background: transparent;
+            border: 1px solid #D4AF37;
+            opacity: 0.3;
+        }
+
+        .header h1 {
+            font-size: 48px;
+            color: #D4AF37;
+            margin-bottom: 10px;
+            font-weight: 900;
+        }
+
+        .header p {
+            font-size: 20px;
+            color: #A8D5C8;
+            font-weight: 600;
+        }
+
+        .subtitle {
+            font-size: 16px;
+            color: rgba(255,255,255,0.7);
+            margin-top: 10px;
+        }
+
+        /* ВИЗУАЛЬНАЯ БАТАРЕЙКА */
+        .battery-visual {
+            background: rgba(42, 157, 143, 0.15);
+            border: 2px solid #D4AF37;
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 40px;
+            text-align: center;
+        }
+
+        .battery-visual h3 {
+            font-size: 18px;
+            color: #D4AF37;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+        }
+
+        .battery-display {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .battery-cell {
+            width: 60px;
+            height: 80px;
+            border: 2px solid #D4AF37;
+            border-radius: 4px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-end;
+            padding: 8px;
+            position: relative;
+            background: rgba(212, 175, 55, 0.05);
+            overflow: hidden;
+        }
+
+        .battery-cell.filled {
+            background: rgba(212, 175, 55, 0.2);
+        }
+
+        .battery-fill {
+            width: 100%;
+            background: #D4AF37;
+            border-radius: 2px;
+            transition: height 0.3s;
+            position: absolute;
+            bottom: 0;
+            left: 0;
+        }
+
+        .battery-label {
+            font-size: 11px;
+            font-weight: 700;
+            color: #D4AF37;
+            text-transform: uppercase;
+            position: relative;
+            z-index: 2;
+        }
+
+        .battery-icon {
+            font-size: 20px;
+            margin-bottom: 4px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .section {
+            background: rgba(42, 42, 42, 0.8);
+            border: 1px solid #D4AF37;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 24px;
+            backdrop-filter: blur(10px);
+        }
+
+        .section-title {
+            font-size: 28px;
+            color: #A8D5C8;
+            margin-bottom: 18px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid #D4AF37;
+            font-weight: 800;
+        }
+
+        .section-icon {
+            display: inline-block;
+            font-size: 24px;
+            margin-right: 10px;
+        }
+
+        .symptom-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 15px;
+            padding: 12px;
+            margin-bottom: 10px;
+            background: rgba(212, 175, 55, 0.05);
+            border-radius: 8px;
+            border-left: 3px solid #D4AF37;
+            transition: all 0.3s;
+        }
+
+        .symptom-item:hover {
+            background: rgba(212, 175, 55, 0.1);
+            transform: translateX(5px);
+        }
+
+        .symptom-item input[type="checkbox"] {
+            width: 24px;
+            height: 24px;
+            cursor: pointer;
+            margin-top: 2px;
+            accent-color: #D4AF37;
+            flex-shrink: 0;
+        }
+
+        .symptom-text {
+            font-size: 16px;
+            line-height: 1.4;
+        }
+
+        .symptom-text strong {
+            color: #D4AF37;
+        }
+
+        .counter {
+            font-size: 14px;
+            color: #A8D5C8;
+            margin-top: 8px;
+            font-weight: 600;
+        }
+
+        .info-box {
+            background: rgba(42, 157, 143, 0.15);
+            border: 1px solid #A8D5C8;
+            border-radius: 8px;
+            padding: 14px;
+            margin-top: 14px;
+            font-size: 14px;
+            line-height: 1.5;
+            color: rgba(255,255,255,0.85);
+        }
+
+        .action-text {
+            color: #D4AF37;
+            font-weight: 600;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 12px;
+            margin-top: 30px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 16px 24px;
+            font-size: 16px;
+            font-weight: 700;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .btn-primary {
+            background: #D4AF37;
+            color: #0a0a0a;
+        }
+
+        .btn-primary:hover {
+            background: #E5C955;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(212, 175, 55, 0.3);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: #A8D5C8;
+            border: 2px solid #A8D5C8;
+        }
+
+        .btn-secondary:hover {
+            background: rgba(168, 213, 200, 0.1);
+        }
+
+        .results-section {
+            display: none;
+        }
+
+        .results-section.show {
+            display: block;
+        }
+
+        .result-card {
+            background: rgba(42, 157, 143, 0.2);
+            border: 2px solid #A8D5C8;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 16px;
+        }
+
+        .result-card.critical {
+            border-color: #FF6B6B;
+            background: rgba(255, 107, 107, 0.1);
+        }
+
+        .result-card.moderate {
+            border-color: #D4AF37;
+            background: rgba(212, 175, 55, 0.1);
+        }
+
+        .result-title {
+            font-size: 22px;
+            color: #D4AF37;
+            margin-bottom: 10px;
+            font-weight: 800;
+        }
+
+        .result-description {
+            font-size: 15px;
+            line-height: 1.6;
+            color: rgba(255,255,255,0.85);
+            margin-bottom: 12px;
+        }
+
+        .result-recommendation {
+            background: rgba(42, 157, 143, 0.3);
+            padding: 14px;
+            border-radius: 8px;
+            font-size: 14px;
+            color: #A8D5C8;
+            font-weight: 600;
+        }
+
+        .priority-badge {
+            display: inline-block;
+            background: #D4AF37;
+            color: #0a0a0a;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 700;
+            margin-bottom: 12px;
+            text-transform: uppercase;
+        }
+
+        .priority-badge.high {
+            background: #FF6B6B;
+            color: #fff;
+        }
+
+        .priority-badge.medium {
+            background: #D4AF37;
+        }
+
+        .priority-badge.low {
+            background: #A8D5C8;
+            color: #0a0a0a;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 20px;
+            color: rgba(255,255,255,0.5);
+            font-size: 14px;
+            border-top: 1px solid #D4AF37;
+            margin-top: 40px;
+        }
+
+        .print-btn {
+            margin-top: 20px;
+        }
+
+        @media print {
+            body {
+                background: white;
+            }
+            .button-group {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- ЗАГОЛОВОК -->
+        <div class="header">
+            <div class="logo-header">
+                <div class="logo-battery">
+                    <div class="battery-segment"></div>
+                    <div class="battery-segment"></div>
+                    <div class="battery-segment"></div>
+                    <div class="battery-segment"></div>
+                    <div class="battery-segment"></div>
+                </div>
+                <div>
+                    <h1>ПАУЭР БАНК</h1>
+                </div>
+            </div>
+            <p>🔍 Полная Диагностика Состояния</p>
+            <div class="subtitle">5 отделений батарейки | Увидишь реальную картину</div>
+        </div>
+
+        <!-- ВИЗУАЛЬНАЯ БАТАРЕЙКА -->
+        <div class="battery-visual">
+            <h3>Твоя батарейка сейчас</h3>
+            <div class="battery-display" id="batteryDisplay">
+                <!-- Заполняется JavaScript -->
+            </div>
+            <p style="font-size: 13px; color: rgba(255,255,255,0.6);">Отвечай на вопросы и видишь как заполняется твоя батарейка ↓</p>
+        </div>
+
+        <!-- ФОРМА ТЕСТИРОВАНИЯ -->
+        <form id="diagnosticForm">
+
+            <!-- 1. СОН -->
+            <div class="section">
+                <div class="section-title">
+                    <span class="section-icon">🌙</span>СОН И ВОССТАНОВЛЕНИЕ
+                </div>
+                <div class="symptom-group">
+                    <label class="symptom-item">
+                        <input type="checkbox" name="sleep" value="1" onchange="updateBattery()">
+                        <div class="symptom-text">
+                            <strong>Тяжело засыпаешь</strong> — крутишься в кровати 30+ минут
+                        </div>
+                    </label>
+                    <label class="symptom-item">
+                        <input type="checkbox" name="sleep" value="1" onchange="updateBattery()">
+                        <div class="symptom-text">
+                            <strong>Просыпаешься ночью</strong> — несколько раз или в одно время
+                        </div>
+                    </label>
+                    <label class="symptom-item">
+                        <input type="checkbox" name="sleep" value="1" onchange="updateBattery()">
+                        <div class="symptom-text">
+                            <strong>Поверхностный сон</strong> — любой звук или свет мешает
+                        </div>
+                    </label>
+                    <label class="symptom-item">
+                        <input type="checkbox" name="sleep" value="1" onchange="updateBattery()">
+                        <div class="symptom-text">
+                            <strong>Просыпаешься невыспавшейся</strong> — даже после 8 часов
+                        </div>
+                    </label>
+                    <label class="symptom-item">
+                        <input type="checkbox" name="sleep" value="1" onchange="updateBattery()">
+                        <div class="symptom-text">
+                            <strong>Кошмары или странные сны</strong> — вызывают тревогу или стресс
+                        </div>
+                    </label>
+                </div>
+                <div class="info-box">
+                    <span class="action-text">📌 Если есть 2+ пунктов:</span> Сон критически влияет на восстановление. Это первый приоритет.
+                </div>
+                <div class="counter" id="sleep-counter"></div>
+            </div>
+
+            <!-- 2. ЖКТ (ЖЕЛУДОК, ПЕЧЕНЬ, ФЕРМЕНТЫ, КИШЕЧНИК) -->
+            <div class="section">
+                <div class="section-title">
+                    <span class="section-icon">🤍</span>ПИЩЕВАРЕНИЕ И ЖКТ
+                </div>
+
+                <div style="margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid #D4AF37;">
+                    <h4 style="color: #A8D5C8; margin-bottom: 12px; font-size: 16px;">ЖЕЛУДОК И КИСЛОТНОСТЬ</h4>
+                    <label class="symptom-item">
+                        <input type="checkbox" name="digestive" value="1" onchange="updateBattery()">
+                        <div class="symptom-text"><strong>Тяжесть после еды</strong> — еда стоит в желудке</div>
+                    </label>
+                    <label class="symptom-item">
+                        <input type="checkbox" name="digestive" value="1" onchange="updateBattery()">
+                        <div class="symptom-text"><strong>Отрыжка или изжога</strong> — кислотность повышена</div>
+                    </label>
+                </div>
+
+                <div style="margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid #D4AF37;">
+                    <h4 style="color: #A8D5C8; margin-bottom: 12px; font-size: 16px;">ПЕЧЕНЬ И ЖЕЛЧЬ</h4>
+                    <label class="symptom-item">
+                        <input type="checkbox" name="digestive" value="1" onchange="updateBattery()">
+                        <div class="symptom-text"><strong>Вздутие после жирной пищи</strong> — дискомфорт справа</div>
+                    </label>
+                    <label class="symptom-item">
+                        <input type="checkbox" name="digestive" value="1" onchange="updateBattery()">
+                        <div class="symptom-text"><strong>Горечь во рту</strong> — проблемы с желчеоттоком</div>
+                    </label>
+                </div>
+
+                <div style="margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid #D4AF37;">
+                    <h4 style="color: #A8D5C8; margin-bottom: 12px; font-size: 16px;">ФЕРМЕНТЫ</h4>
+                    <label class="symptom-item">
+                        <input type="checkbox" name="digestive" value="1" onchange="updateBattery()">
+                        <div class="symptom-text"><strong>Непереваренная еда в стуле</strong> — видишь куски</div>
+                    </label>
+                    <label class="symptom-item">
+                        <input type="checkbox" name="digestive" value="1" onchange="updateBattery()">
+                        <div class="symptom-text"><strong>Тяжесть после белка</strong> — мясо, рыба, яйца</div>
+                    </label>
+                </div>
+
+                <div>
+                    <h4 style="color: #A8D5C8; margin-bottom: 12px; font-size: 16px;">КИШЕЧНИК И МИКРОФЛОРА</h4>
+                    <label class="symptom-item">
+                        <input type="checkbox" name="digestive" value="1" onchange="updateBattery()">
+                        <div class="symptom-text"><strong>Вздутие живота</strong> — особенно к концу дня</div>
+                    </label>
+                    <label class="symptom-item">
+                        <input type="checkbox" name="digestive" value="1" onchange="updateBattery()">
+                        <div class="symptom-text"><strong>Запоры или нестабильный стул</strong> — непредсказуемо</div>
+                    </label>
+                </div>
+
+                <div class="info-box" style="margin-top: 14px;">
+                    <span class="action-text">📌 ЖКТ — это фундамент:</span> Все остальные системы зависят от пищеварения и усвоения нутриентов
+                </div>
+                <div class="counter" id="digestive-counter"></div>
+            </div>
+
+            <!-- 3. СТРЕСС И НЕРВНАЯ СИСТЕМА -->
+            <div class="section">
+                <div class="section-title">
+                    <span class="section-icon">😰</span>СТРЕСС И НЕРВНАЯ СИСТЕМА
+                </div>
+                <div class="symptom-group">
+                    <label class="symptom-item">
+                        <input type="checkbox" name="stress" value="1" onchange="updateBattery()">
+                        <div class="symptom-text">
+                            <strong>Хронический стресс</strong> — постоянное напряжение, не можешь расслабиться
+                        </div>
+                    </label>
+                    <label class="symptom-item">
+                        <input type="checkbox" name="stress" value="1" onchange="updateBattery()">
+                        <div class="symptom-text">
+                            <strong>Тревожность</strong> — беспокойство, панические атаки, боязнь неудачи
+                        </div>
+                    </label>
+                    <label class="symptom-item">
+                        <input type="checkbox" name="stress" value="1" onchange="updateBattery()">
+                        <div class="symptom-text">
+                            <strong>Проблемы с пищеварением при стрессе</strong> — боли, вздутие, запоры
+                        </div>
+                    </label>
+                    <label class="symptom-item">
+                        <input type="checkbox" name="stress" value="1" onchange="updateBattery()">
+                        <div class="symptom-text">
+                            <strong>Раздражительность</strong> — вспыльчивость, нетерпеливость
+                        </div>
+                    </label>
+                    <label class="symptom-item">
+                        <input type="checkbox" name="stress" value="1" onchange="updateBattery()">
+                        <div class="symptom-text">
+                            <strong>Не можешь восстановиться</strong> — даже в выходные устаёшь
+                        </div>
+                    </label>
+                </div>
+                <div class="info-box">
+                    <span class="action-text">📌 Стресс разрушает:</span> Блокирует пищеварение, повышает кортизол, мешает восстановлению
+                </div>
+                <div class="counter" id="stress-counter"></div>
+            </div>
+
+            <!-- 4. ДВИЖЕНИЕ -->
+            <div class="section">
+                <div class="section-title">
+                    <span class="section-icon">🏃</span>ДВИЖЕНИЕ И ФИЗИЧЕСКАЯ АКТИВНОСТЬ
+                </div>
+                <div class="symptom-group">
+                    <label class="symptom-item">
+                        <input type="checkbox" name="movement" value="1" onchange="updateBattery()">
+                        <div class="symptom-text">
+                            <strong>Нет энергии для движения</strong> — даже небольшая прогулка утомляет
+                        </div>
+                    </label>
+                    <label class="symptom-item">
+                        <input type="checkbox" name="movement" value="1" onchange="updateBattery()">
+                        <div class="symptom-text">
+                            <strong>Боль в мышцах после движения</strong> — DOMS, долго восстанавливается
+                        </div>
+                    </label>
+                    <label class="symptom-item">
+                        <input type="checkbox" name="movement" value="1" onchange="updateBattery()">
+                        <div class="symptom-text">
+                            <strong>Отсутствие гибкости</strong> — скованность, ограниченный диапазон движения
+                        </div>
+                    </label>
+                    <label class="symptom-item">
+                        <input type="checkbox" name="movement" value="1" onchange="updateBattery()">
+                        <div class="symptom-text">
+                            <strong>Вялость, невозможность заставить себя двигаться</strong> — мотивация на нуле
+                        </div>
+                    </label>
+                    <label class="symptom-item">
+                        <input type="checkbox" name="movement" value="1" onchange="updateBattery()">
+                        <div class="symptom-text">
+                            <strong>После движения ещё больше усталости</strong> — энергии не добавляет
+                        </div>
+                    </label>
+                </div>
+                <div class="info-box">
+                    <span class="action-text">📌 Движение должно давать энергию:</span> Если усталость усиливается — значит, организм истощен
+                </div>
+                <div class="counter" id="movement-counter"></div>
+            </div>
+
+            <!-- 5. ОБЩИЕ СИГНАЛЫ ЭНЕРГИИ -->
+            <div class="section">
+                <div class="section-title">
+                    <span class="section-icon">⚡</span>ОБЩИЕ СИГНАЛЫ ЭНЕРГИИ И ИММУНИТЕТА
+                </div>
+                <div class="symptom-group">
+                    <label class="symptom-item">
+                        <input type="checkbox" name="general" value="1" onchange="updateBattery()">
+                        <div class="symptom-text">
+                            <strong>Низкая энергия целый день</strong> — не можешь встать с утра
+                        </div>
+                    </label>
+                    <label class="symptom-item">
+                        <input type="checkbox" name="general" value="1" onchange="updateBattery()">
+                        <div class="symptom-text">
+                            <strong>Тяга к сладкому</strong> — особенно во второй половине дня
+                        </div>
+                    </label>
+                    <label class="symptom-item">
+                        <input type="checkbox" name="general" value="1" onchange="updateBattery()">
+                        <div class="symptom-text">
+                            <strong>Проблемы с кожей</strong> — прыщи, сыпь, покраснения (сигнал ЖКТ)
+                        </div>
+                    </label>
+                    <label class="symptom-item">
+                        <input type="checkbox" name="general" value="1" onchange="updateBattery()">
+                        <div class="symptom-text">
+                            <strong>Частые простуды и инфекции</strong> — болеешь более 2 раз в год
+                        </div>
+                    </label>
+                    <label class="symptom-item">
+                        <input type="checkbox" name="general" value="1" onchange="updateBattery()">
+                        <div class="symptom-text">
+                            <strong>Волосы, ногти, язык говорят о дефицитах</strong> — тусклые волосы, ломкие ногти
+                        </div>
+                    </label>
+                </div>
+                <div class="info-box">
+                    <span class="action-text">📌 Энергия зависит от:</span> Всех 5 отделений батарейки вместе
+                </div>
+                <div class="counter" id="general-counter"></div>
+            </div>
+
+            <!-- КНОПКИ ДЕЙСТВИЯ -->
+            <div class="button-group">
+                <button type="button" class="btn btn-secondary" onclick="resetForm()">Очистить форму</button>
+                <button type="button" class="btn btn-primary" onclick="showResults()">Посмотреть результаты</button>
+            </div>
+
+        </form>
+
+        <!-- РЕЗУЛЬТАТЫ -->
+        <div class="results-section" id="resultsSection">
+            <div class="section">
+                <div class="section-title">✨ ТВОЯ РЕАЛЬНАЯ КАРТИНА</div>
+                <p style="color: rgba(255,255,255,0.8); margin-bottom: 20px;">
+                    Вот что происходит в твоём теле и что нужно делать:
+                </p>
+                <div id="resultsContainer"></div>
+                
+                <div style="margin-top: 30px; padding-top: 30px; border-top: 1px solid #D4AF37;">
+                    <h3 style="color: #D4AF37; margin-bottom: 15px; font-size: 20px;">🎯 ТВОЙ ПЛАН ДЕЙСТВИЙ</h3>
+                    <div class="info-box" style="background: rgba(212, 175, 55, 0.15); border-color: #D4AF37;">
+                        <p style="margin-bottom: 12px;">
+                            <strong style="color: #D4AF37;">1. ФУНДАМЕНТ ПЕРВЫЙ — ЖКТ</strong><br>
+                            Если проблемы с пищеварением → начни ОТСЮДА. Остальное невозможно без нормального ЖКТ.
+                        </p>
+                        <p style="margin-bottom: 12px;">
+                            <strong style="color: #D4AF37;">2. ПАРАЛЛЕЛЬНО — СОН</strong><br>
+                            Без восстановления ночью организм не меняется. 4-6 недель на улучшение сна.
+                        </p>
+                        <p style="margin-bottom: 12px;">
+                            <strong style="color: #D4AF37;">3. КОГДА СТАБИЛИЗИРУЕТСЯ — СТРЕСС</strong><br>
+                            Высокий кортизол блокирует всё. Но сначала убедись что ЖКТ и сон работают.
+                        </p>
+                        <p style="margin-bottom: 12px;">
+                            <strong style="color: #D4AF37;">4. ДВИЖЕНИЕ — ПОСЛЕДНИЙ ПРИОРИТЕТ</strong><br>
+                            Добавляй движение только когда есть энергия. Иначе ещё больше истощишься.
+                        </p>
+                        <p>
+                            <strong style="color: #D4AF37;">5. КАЖДЫЙ БЛОК — 4-6 НЕДЕЛЬ</strong><br>
+                            Не прыгай между всем. Дай время организму адаптироваться.
+                        </p>
+                    </div>
+                </div>
+
+                <button type="button" class="btn btn-secondary print-btn" onclick="window.print()">🖨️ Распечатать результаты</button>
+            </div>
+        </div>
+
+        <!-- ФУТЕР -->
+        <div class="footer">
+            <p>💚 ПАУЭР БАНК ДЛЯ ТЕЛА | Яна Дрига — Нутрициолог & Натуропат</p>
+            <p style="margin-top: 10px; font-size: 12px;">Полная диагностика всех 5 отделений батарейки. Эта информация помогает понять где именно сбой.</p>
+        </div>
+    </div>
+
+    <script>
+        const categories = [
+            { name: 'sleep', label: 'СОН', icon: '🌙', desc: 'Восстановление и нервная система' },
+            { name: 'digestive', label: 'ЖКТ', icon: '🤍', desc: 'Пищеварение и усвоение' },
+            { name: 'stress', label: 'СТРЕСС', icon: '😰', desc: 'Нервная система и кортизол' },
+            { name: 'movement', label: 'ДВИЖЕНИЕ', icon: '🏃', desc: 'Физическая активность' },
+            { name: 'general', label: 'ЭНЕРГИЯ', icon: '⚡', desc: 'Общие показатели' }
+        ];
+
+        // Инициализация батарейки
+        function initBattery() {
+            let html = '';
+            categories.forEach((cat, idx) => {
+                html += `
+                    <div class="battery-cell" id="cell-${cat.name}">
+                        <div class="battery-fill" id="fill-${cat.name}" style="height: 0%;"></div>
+                        <div class="battery-icon">${cat.icon}</div>
+                        <div class="battery-label">${cat.label}</div>
+                    </div>
+                `;
+            });
+            document.getElementById('batteryDisplay').innerHTML = html;
+        }
+
+        // Обновление батарейки
+        function updateBattery() {
+            categories.forEach(cat => {
+                const count = document.querySelectorAll(`input[name="${cat.name}"]:checked`).length;
+                const maxItems = cat.name === 'digestive' ? 8 : cat.name === 'general' ? 5 : 5;
+                const percentage = (count / maxItems) * 100;
+                
+                const fill = document.getElementById(`fill-${cat.name}`);
+                const cell = document.getElementById(`cell-${cat.name}`);
+                
+                fill.style.height = percentage + '%';
+                
+                if (percentage > 0) {
+                    cell.classList.add('filled');
+                } else {
+                    cell.classList.remove('filled');
+                }
+
+                // Обновление счётчика
+                const counter = document.getElementById(`${cat.name}-counter`);
+                if (count > 0) {
+                    counter.textContent = `✓ Отмечено: ${count} из ${maxItems}`;
+                    counter.style.color = '#D4AF37';
+                } else {
+                    counter.textContent = '';
+                }
+            });
+        }
+
+        // Слушатели
+        document.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
+            checkbox.addEventListener('change', updateBattery);
+        });
+
+        // Показать результаты
+        function showResults() {
+            const results = {};
+            categories.forEach(cat => {
+                const count = document.querySelectorAll(`input[name="${cat.name}"]:checked`).length;
+                results[cat.name] = {
+                    count: count,
+                    ...cat
+                };
+            });
+
+            const sorted = Object.values(results).sort((a, b) => b.count - a.count);
+
+            let html = '';
+            sorted.forEach((cat, index) => {
+                if (cat.count > 0) {
+                    let priority = 'low';
+                    const maxItems = cat.name === 'digestive' ? 8 : cat.name === 'general' ? 5 : 5;
+                    const percentage = (cat.count / maxItems) * 100;
+                    
+                    if (percentage >= 60) priority = 'high';
+                    else if (percentage >= 40) priority = 'medium';
+
+                    const priorityText = priority === 'high' ? '🔴 ВЫСОКИЙ ПРИОРИТЕТ' : priority === 'medium' ? '🟡 СРЕДНИЙ ПРИОРИТЕТ' : '🟢 ВНИМАНИЕ';
+                    
+                    html += `
+                        <div class="result-card ${priority === 'high' ? 'critical' : priority === 'medium' ? 'moderate' : ''}">
+                            <div class="priority-badge ${priority}">${priorityText}</div>
+                            <div class="result-title">${cat.icon} ${cat.label}</div>
+                            <div class="result-description">
+                                Отмечено <strong>${cat.count} из ${maxItems}</strong> (${Math.round(percentage)}%)
+                            </div>
+                            <div class="result-recommendation">
+                                ✓ Фокус: <strong>${cat.desc}</strong>
+                            </div>
+                        </div>
+                    `;
+                }
+            });
+
+            document.getElementById('resultsContainer').innerHTML = html || '<p style="color: #A8D5C8;">Отметь хотя бы один симптом чтобы увидеть результаты</p>';
+            document.getElementById('resultsSection').classList.add('show');
+            window.scrollTo({ top: document.getElementById('resultsSection').offsetTop - 100, behavior: 'smooth' });
+        }
+
+        // Очистить форму
+        function resetForm() {
+            document.getElementById('diagnosticForm').reset();
+            document.getElementById('resultsSection').classList.remove('show');
+            updateBattery();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // Инициализация при загрузке
+        window.addEventListener('load', initBattery);
+    </script>
+</body>
+</html>
